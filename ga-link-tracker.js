@@ -6,7 +6,7 @@ function addClickEvents(site_name, param2, param3){ //Add click event tracking t
 	//Every link's parent container element must have a 'data-ga-name' attribute. A popup will show up identifing
 	//the link that needs the attribute if it is not present. (For example, links in the navigation section will need their parent container to have data-ga-name="navigation")
 	//jQuery selectors for what is considered a "containing" element
-	var containers = 'div[id], div[class], header, footer, section, aside, nav, body, html';
+	var containers = 'div[id], div[class], main, header, footer, section, article, aside, nav, body, html';
 
 	//Options:
 	//========
