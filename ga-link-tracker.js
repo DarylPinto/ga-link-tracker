@@ -32,12 +32,12 @@ function addClickEvents(site_name, param2, param3){ //Add click event tracking t
 	//console.log(site_name + ' | ' + dev_mode + ' | ' + ignored_links)
 
 	$('a').not(ignored_links).each(function(){ //For every link (besides those specifically ignored)
-		if( $(this).text() != '' ){ //Identify link by it's text. (or it's ID if there's no text, or it's class if there's no ID)
+		if( $(this).text() != '' ){ //Identify link by it's text. (or its ID if there's no text, or its class if there's no ID)
 			var tagEnd = $(this).text();
 		}else if( $(this).attr('id') != undefined ){
-			var tagEnd = $(this).attr('id');
+			var tagEnd = $(this).attr('id').replace(/(-|_)/g, ' ');
 		}else if( $(this).attr('class') != undefined ){
-			var tagEnd = $(this).attr('class');
+			var tagEnd = $(this).attr('class').replace(/(-|_)/g, ' ');
 		}
 
 		var tag = $(this).closest(containers).attr('data-ga-name') + ' - ' + tagEnd; //Link name in google analytics is: 'Containing element - Link'
