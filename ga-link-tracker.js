@@ -1,37 +1,47 @@
-function addClickEvents(site_name, param2, param3){ //Add click event tracking to each link.
+function addClickTracking(site_name, param2, param3, param4){ //Add click event tracking to each link.
 
 	//==== HOW TO USE THIS FUNCTION:====
 
-	//Calling this function automatically adds google analytics event tracking to every link on the page besides those specified by ignored_links parameter (See below for further details)
-	//Every link's parent container element must have a 'data-ga-name' attribute. A popup will show up identifing
-	//the link that needs the attribute if it is not present. (For example, links in the navigation section will need their parent container to have data-ga-name="navigation")
-	//jQuery selectors for what is considered a "containing" element
-	var containers = 'div[id], div[class], main, header, footer, section, article, aside, nav, body, html';
+	//Calling this function automatically adds google analytics event tracking to every link on the page. There are also options to target or omit specific links.
+	//Every link's containing element must have a 'data-ga-name' attribute. A popup will show up identifing
+	//the element that needs the attribute if it is not present. (For example, links in the navigation section will need their parent container to have data-ga-name="navigation")
+	//here are the jQuery selectors for what is considered a "containing" element:
+	var containers = '*[data-ga-name], div[id], div[class]';
 
 	//Options:
 	//========
 	//Param 1: site_name: String. Name of website
 	//Param 2: dev_mode: Boolean. If true, show pop-up with click event info. If false, send the info.
-	//Param 3: ignored_links: Array. jQuery selectors that you do not want to attach click tracking to. e.g. ['.sidebar a', '.footer a']
+	//Param 3: selection_type: 'include' or 'exclude'. If set to 'include', only target links set in the next parameter, if set to 'exclude', target every link except those set in the next paramater
+	//Param 4: link_list: Array. jQuery selectors that you want to 'include' or 'exclude' (as set by previous parameter). e.g. ['.sidebar', '.footer']
 	//
 
 	//==================================
 
 	var dev_mode;
-	var ignored_links;
+	var selection_type;
+	var link_list;
 
-	//Handle parameters 2 or 3 being optional (can be used in interchanging order or not at all)
+	//Handle parameters 2,3 or 4 being optional (can be used in interchanging order or not at all)
 	dev_mode = (typeof param2 === 'boolean') ? param2 : dev_mode;
 	dev_mode = (typeof param3 === 'boolean') ? param3 : dev_mode;
-	ignored_links = ( $.isArray(param2) ) ? param2 : ignored_links;
-	ignored_links = ( $.isArray(param3) ) ? param3 : ignored_links;
+	dev_mode = (typeof param4 === 'boolean') ? param4 : dev_mode;
+	selection_type = (typeof param2 === 'string') ? param2 : selection_type;
+	selection_type = (typeof param3 === 'string') ? param3 : selection_type;
+	selection_type = (typeof param4 === 'string') ? param4 : selection_type;
+	link_list = ( $.isArray(param2) ) ? param2 : link_list;
+	link_list = ( $.isArray(param3) ) ? param3 : link_list;
+	link_list = ( $.isArray(param4) ) ? param4 : link_list;
 
-	ignored_links = ( ignored_links == null ) ? [] : ignored_links.toString();
+	//Assign defaults if nothing is provided
+	link_list = ( link_list == null ) ? [] : link_list.map(function(element){return element + ' a'}).toString();
 	dev_mode = ( dev_mode == null ) ? false : dev_mode;
+	selection_type = ( selection_type == null ) ? 'exclude' : selection_type;
 
-	//console.log(site_name + ' | ' + dev_mode + ' | ' + ignored_links)
+	//Links to iterate through
+	var targeted_links = ( selection_type === 'exclude' ) ? $('a').not(link_list) : $(link_list);
 
-	$('a').not(ignored_links).each(function(){ //For every link (besides those specifically ignored)
+	$(targeted_links).each(function(){ //For every link targeted
 		if( $(this).text() != '' ){ //Identify link by it's text. (or its ID if there's no text, or its class if there's no ID)
 			var tagEnd = $(this).text();
 		}else if( $(this).attr('id') != undefined ){
