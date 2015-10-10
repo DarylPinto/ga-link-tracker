@@ -1,6 +1,6 @@
 /*
 
-Instructions: Call the 'addClickTracking()'' function when the page has loaded like so:
+Instructions: Call the 'addClickTracking()' function when the page has loaded like so:
 
 addClickTracking({
 	site_name: 'Baycrest',
@@ -21,20 +21,6 @@ function qs(selector){
 
 function qsa(selector){ //Simulates jQuery $(el)
 	return document.querySelectorAll(selector);
-}
-
-/*
-
-qsa('.container').each(function(){
-	this.attr('data-ga-name', 'color');
-});
-
-*/
-
-NodeList.prototype.each = function(callback){
-	for(var i=0;i < this.length;i++){
-		callback(this[i]);
-	}
 }
 
 NodeList.prototype.onClick = function(callback){ //Simulates jQuery $(el).click();
@@ -58,27 +44,25 @@ NodeList.prototype.attr = function(attribute, desired_value){ //Simulates jQuery
 
 //Main function
 
-function addClickTracking(settings){
+function addClickTracking(options){
 
-	//Default settings
-	var defaults = {
+	//Default options
+	var default_options = {
 		site_name: '',
-		dev_mode: true,
-		selection_mode: 'include',
-		targets: []
+		targets: [],
+		exclusions: [],
+		log_event_data_to_console: true
 	}
 
 	//Apply defaults to undefined values
-	settings = (settings === undefined)	? defaults : settings;
+	options = (options === undefined)	? default_options : options;
 
-	for(var property in Object.keys(defaults)){
-
-		if(!settings.hasOwnProperty(property)){
-			settings[property] = defaults[property].value;
+	for(var property in default_options){
+		if(!options.hasOwnProperty(property)){
+			options.property = default_options.property;
 		}
-
 	}
 
-	console.log(settings)
+	console.log(options)
 
 }
