@@ -3,15 +3,16 @@
 Instructions: Call the 'addClickTracking()' function when the page has loaded like so:
 
 addClickTracking({
-	site_name: 'Baycrest',
-	dev_mode: true,
-	selection_mode: 'include',
-	targets: ['#container a', '.info-box'] 
+	site_name: 'Scratch',
+	targets: ['a'],
+	exclusions: ['#main-footer a', '#main-header a'],
+	show_console_logs: true
 });
 
 This will automatically add event tracking to all specified targets
 
 */
+
 
 //jQuery simulations
 
@@ -42,6 +43,37 @@ NodeList.prototype.attr = function(attribute, desired_value){ //Simulates jQuery
 	}
 }
 
+//Helper functions
+
+function copyMissingProperties(obj_source, obj_target){ //Copies properties from obj_source to obj_target if they're undefined in obj_target
+
+	obj_target = (obj_target === undefined)	? obj_source : obj_target;
+
+	for(var property in obj_source){
+		if(!obj_target.hasOwnProperty(property)){
+			obj_target[property] = obj_source[property];
+		}
+	}
+
+	return obj_target;
+
+}
+
+function createTargetSelector(targets, exclusions){
+
+	if(exclusions.length > 0){
+		exclusions = exclusions.map(function(selector){
+			return ':not('+selector+')';
+		});
+		targets = targets.map(function(selector){
+			return selector + exclusions.join('');
+		});
+	}
+
+	return targets.join(', ');
+
+}
+
 //Main function
 
 function addClickTracking(options){
@@ -51,18 +83,14 @@ function addClickTracking(options){
 		site_name: '',
 		targets: [],
 		exclusions: [],
-		log_event_data_to_console: true
+		show_console_logs: true
 	}
 
-	//Apply defaults to undefined values
-	options = (options === undefined)	? default_options : options;
+	//Apply default options
+	options = copyMissingProperties(default_options, options);
 
-	for(var property in default_options){
-		if(!options.hasOwnProperty(property)){
-			options.property = default_options.property;
-		}
-	}
+	var selector = createTargetSelector(options.targets, options.exclusions);
 
-	console.log(options)
+	return qsa(selector);
 
 }
