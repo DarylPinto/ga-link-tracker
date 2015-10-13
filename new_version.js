@@ -1,6 +1,11 @@
 /*
+==================================
+Google Analytics Click Event Tracker v.2.0
+By: Scratch Marketing
+Support: IE9+
 
-Instructions: Call the 'addClickTracking()' function when the page has loaded like so:
+
+Instructions: Call the 'addClickTracking()' function after the page has loaded like so:
 
 addClickTracking({
 	site_name: 'Scratch',
@@ -9,8 +14,8 @@ addClickTracking({
 	show_console_logs: true
 });
 
-This will automatically add event tracking to all specified targets
-
+This will automatically add event tracking to all specified targets.
+==================================
 */
 
 
@@ -45,7 +50,8 @@ NodeList.prototype.attr = function(attribute, desired_value){ //Simulates jQuery
 
 //Helper functions
 
-function copyMissingProperties(obj_source, obj_target){ //Copies properties from obj_source to obj_target if they're undefined in obj_target
+function copyMissingProperties(obj_source, obj_target){
+//Copy properties from obj_source to obj_target if they're undefined in obj_target
 
 	obj_target = (obj_target === undefined)	? obj_source : obj_target;
 
@@ -59,7 +65,9 @@ function copyMissingProperties(obj_source, obj_target){ //Copies properties from
 
 }
 
-function createTargetSelector(targets, exclusions){
+function createTargetSelector(targets, exclusions){ 
+//Take two css selector arrays and output a selector string that targets
+//everything in the first array but omits everything in the second.
 
 	if(exclusions.length > 0){
 		exclusions = exclusions.map(function(selector){
@@ -83,7 +91,7 @@ function addClickTracking(options){
 		site_name: '',
 		targets: [],
 		exclusions: [],
-		show_console_logs: true
+		show_console_logs: false
 	}
 
 	//Apply default options
@@ -91,6 +99,10 @@ function addClickTracking(options){
 
 	var selector = createTargetSelector(options.targets, options.exclusions);
 
-	return qsa(selector);
+	qsa(selector).onClick(function(){
+		console.log(this.textContent);
+	});
 
 }
+
+var test_ga = "ga('send', {\n\thitType: 'event',\n\teventCategory: 'Videos',\n\teventLabel: 'Fall Campaign'\n});"
