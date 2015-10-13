@@ -26,6 +26,9 @@ function qs(selector){
 }
 
 function qsa(selector){ //Simulates jQuery $(el)
+
+	//<NODE>.attributes.nodeValue returns the classname
+
 	return document.querySelectorAll(selector);
 }
 
@@ -65,6 +68,19 @@ function copyMissingProperties(obj_source, obj_target){
 
 }
 
+function getElementLabel(el){
+
+	var label;
+	if(el.textContent.length > 0){
+		var text_arr = el.textContent.split(' ');
+		text_arr = text_arr.splice(0, 5);
+
+		label = text_arr.join(' ');
+	}
+
+	return label;
+}
+
 function createTargetSelector(targets, exclusions){ 
 //Take two css selector arrays and output a selector string that targets
 //everything in the first array but omits everything in the second.
@@ -102,6 +118,8 @@ function addClickTracking(options){
 	qsa(selector).onClick(function(){
 		console.log(this.textContent);
 	});
+
+	return getElementLabel(qsa(selector)[0]);
 
 }
 
