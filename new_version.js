@@ -22,37 +22,55 @@ This will automatically add event tracking to all specified targets.
 //jQuery simulations//
 //////////////////////
 
-function qs(selector){
+function qs(selector){ //Simulates jQuery $(el)
 	return document.querySelector(selector);
 }
-
 function qsa(selector){ //Simulates jQuery $(el)
+	//If argument is a string, run queryselectorall on it
+	if(typeof selector === 'string' || typeof selector === 'undefined'){
+		selector = (arguments.length === 1 && selector.length > 0) ? selector : 'no tag'; //Create empty nodelist if no parameter is given
+		return document.querySelectorAll(selector);
+	}
 
-	selector = (arguments.length === 1) ? selector : 'no tag'; //Create empty nodelist if no parameter is given
-	return document.querySelectorAll(selector);
-
-}
-
-NodeList.prototype.onClick = function(callback){ //Simulates jQuery $(el).click();
-	for(var i=0;i < this.length;i++){
-		this[i].addEventListener('click', callback);
+	//If argument is a Node, return a nodelist with that node inside it
+	else{
+		var el = selector;
+		return el.toNodeList();
 	}
 }
 
-Node.prototype.onClick = function(callback){ //Simulates jQuery $(el).click();
-	this.addEventListener('click', callback);
+Node.prototype.toNodeList = function(){
+	//Converts node to nodelist.
+	//(useful for using all the following nodelist methods
+	//without needing to make seperate ones specifically for nodes)
+	this.setAttribute('wrapNodeList', '');
+	var list = document.querySelectorAll('[wrapNodeList]');
+	this.removeAttribute('wrapNodeList');
+	return list;
+}
+
+NodeList.prototype.each = function(callback){ //Simulates jQuery $(el).each(); 
+	for(var i=0;i < this.length;i++){
+		callback.call(this[i]);
+	}
+}
+
+NodeList.prototype.onClick = function(callback){ //Simulates jQuery $(el).click();
+	this.each(function(){
+		this.addEventListener('click', callback);
+	});
 }
 
 NodeList.prototype.attr = function(attribute, desired_value){ //Simulates jQuery $(el).attr();
 	if(arguments.length === 1){
-		for(var i=0;i < this.length;i++){
-			var x = this[i].getAttributeNode(attribute);
+		this.each(function(){
+			var x = this.getAttributeNode(attribute);
 			return (x == null) ? null : x.value;
-		}
+		});
 	}else{
-		for(var i=0;i < this.length;i++){
-			this[i].setAttribute(attribute, desired_value);
-		}
+		this.each(function(){
+			this.setAttribute(attribute, desired_value);
+		});
 	}
 }
 
@@ -83,9 +101,19 @@ function getElementLabel(el){
 		text_arr = text_arr.splice(0, 5);
 
 		label = text_arr.join(' ');
+	}else if(el.attributes.id != undefined){
+		label = el.attributes.id.value.replace(/(-|_)/g, ' ');
+	}else if(el.attributes.class != undefined){
+		label = el.attributes.class.value.replace(/(-|_)/g, ' ');
+	}else{
+		label = '<LABEL>';
 	}
 
 	return label;
+}
+
+function getElementCategory(el){
+
 }
 
 function createTargetSelector(targets, exclusions){ 
