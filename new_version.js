@@ -98,26 +98,25 @@ function copyMissingProperties(obj_source, obj_target){
 
 }
 
-function getElementLabel(el){
-
-	var label;
-	if(el.textContent.length > 0){
+function labelElement(el, attr){
+	if(attr === 'text'){
 		var text_arr = el.textContent.split(' ');
-		text_arr = text_arr.splice(0, 5);
+		text_arr = text_arr.splice(0, 4);
 
-		label = text_arr.join(' ');
-	}else if(el.attributes.id != undefined){
-		label = el.attributes.id.value.replace(/(-|_)/g, ' ');
-	}else if(el.attributes.class != undefined){
-		label = el.attributes.class.value.replace(/(-|_)/g, ' ');
+		return text_arr.join(' ');
+	}else if(attr === undefined){
+		return '<LABEL>'
 	}else{
-		label = '<LABEL>';
+		return el.attributes[attr].value.replace(/(-|_)/g, ' ');
 	}
-
-	return label;
 }
 
 function getElementCategory(el){
+	var valid_attrs = ['data-ga-category', 'id'];
+
+	valid_attrs.forEach(function(attribute){
+
+	});
 
 }
 
@@ -166,34 +165,3 @@ function addClickTracking(options){
 }
 
 var test_ga = "ga('send', {\n\thitType: 'event',\n\teventCategory: 'Videos',\n\teventLabel: 'Fall Campaign'\n});"
-
-/*
-form_status = {
-	redirectURL: $('input[name="retURL"]').attr('value'),
-	emailValid: false
-}
-
-$('input[name="retURL"]').attr('value', '/#');
-
-$('#email').focusout(function(){
-
-	if($(email).val().length > 0){
-		var link = form_status.redirectURL;
-		form_status.emailValid = true;
-	}else{
-		var link = '/#';
-		form_status.emailValid = false;
-	}
-	
-	$('input[name="retURL"]').attr('value', link);
-
-});
-
-$('#submit').click(function(){
-	if(!form_status.emailValid){
-		alert('Invalid Email!');
-	}
-});
-
-http://pastebin.com/FXbY92FB
-*/
