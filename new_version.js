@@ -18,8 +18,9 @@ This will automatically add event tracking to all specified targets.
 ==================================
 */
 
-
-//jQuery simulations
+//////////////////////
+//jQuery simulations//
+//////////////////////
 
 function qs(selector){
 	return document.querySelector(selector);
@@ -27,15 +28,19 @@ function qs(selector){
 
 function qsa(selector){ //Simulates jQuery $(el)
 
-	//<NODE>.attributes.nodeValue returns the classname
-
+	selector = (arguments.length === 1) ? selector : 'no tag'; //Create empty nodelist if no parameter is given
 	return document.querySelectorAll(selector);
+
 }
 
 NodeList.prototype.onClick = function(callback){ //Simulates jQuery $(el).click();
 	for(var i=0;i < this.length;i++){
 		this[i].addEventListener('click', callback);
 	}
+}
+
+Node.prototype.onClick = function(callback){ //Simulates jQuery $(el).click();
+	this.addEventListener('click', callback);
 }
 
 NodeList.prototype.attr = function(attribute, desired_value){ //Simulates jQuery $(el).attr();
@@ -51,7 +56,9 @@ NodeList.prototype.attr = function(attribute, desired_value){ //Simulates jQuery
 	}
 }
 
-//Helper functions
+////////////////////
+//Helper functions//
+////////////////////
 
 function copyMissingProperties(obj_source, obj_target){
 //Copy properties from obj_source to obj_target if they're undefined in obj_target
@@ -83,7 +90,7 @@ function getElementLabel(el){
 
 function createTargetSelector(targets, exclusions){ 
 //Take two css selector arrays and output a selector string that targets
-//everything in the first array but omits everything in the second.
+//everything in the first array but excludes everything in the second.
 
 	if(exclusions.length > 0){
 		exclusions = exclusions.map(function(selector){
@@ -98,7 +105,9 @@ function createTargetSelector(targets, exclusions){
 
 }
 
-//Main function
+/////////////////
+//Main function//
+/////////////////
 
 function addClickTracking(options){
 
