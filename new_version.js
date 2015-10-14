@@ -1,6 +1,6 @@
 /*
 ==================================
-Google Analytics Click Event Tracker v.2.0
+Google Analytics Click Event Tracker v2.0.0
 By: Scratch Marketing
 Support: IE9+
 
@@ -25,6 +25,7 @@ This will automatically add event tracking to all specified targets.
 function qs(selector){ //Simulates jQuery $(el)
 	return document.querySelector(selector);
 }
+
 function qsa(selector){ //Simulates jQuery $(el)
 	//If argument is a string, run queryselectorall on it
 	if(typeof selector === 'string' || typeof selector === 'undefined'){
@@ -62,16 +63,20 @@ NodeList.prototype.onClick = function(callback){ //Simulates jQuery $(el).click(
 }
 
 NodeList.prototype.attr = function(attribute, desired_value){ //Simulates jQuery $(el).attr();
+	var return_value;
+	var node_list = this;
 	if(arguments.length === 1){
 		this.each(function(){
 			var x = this.getAttributeNode(attribute);
-			return (x == null) ? null : x.value;
+			return_value = (x == null) ? undefined : x.value;
 		});
 	}else{
 		this.each(function(){
 			this.setAttribute(attribute, desired_value);
+			return_value = node_list;
 		});
 	}
+	return return_value;
 }
 
 ////////////////////
@@ -161,3 +166,34 @@ function addClickTracking(options){
 }
 
 var test_ga = "ga('send', {\n\thitType: 'event',\n\teventCategory: 'Videos',\n\teventLabel: 'Fall Campaign'\n});"
+
+/*
+form_status = {
+	redirectURL: $('input[name="retURL"]').attr('value'),
+	emailValid: false
+}
+
+$('input[name="retURL"]').attr('value', '/#');
+
+$('#email').focusout(function(){
+
+	if($(email).val().length > 0){
+		var link = form_status.redirectURL;
+		form_status.emailValid = true;
+	}else{
+		var link = '/#';
+		form_status.emailValid = false;
+	}
+	
+	$('input[name="retURL"]').attr('value', link);
+
+});
+
+$('#submit').click(function(){
+	if(!form_status.emailValid){
+		alert('Invalid Email!');
+	}
+});
+
+http://pastebin.com/FXbY92FB
+*/
