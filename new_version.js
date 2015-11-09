@@ -11,10 +11,10 @@ addClickTracking({
 	site_name: 'Scratch',
 	targets: ['a'],
 	exclusions: ['#main-footer a', '#main-header a'],
-	show_console_logs: true
+	show_console_logs: false
 });
 
-This will automatically add event tracking to all specified targets.
+This will automatically add click event tracking to all specified targets.
 ==================================
 */
 
@@ -104,18 +104,38 @@ function labelElement(el, attr){
 		text_arr = text_arr.splice(0, 4);
 
 		return text_arr.join(' ');
-	}else if(attr === undefined){
-		return '<LABEL>'
+	}else if(attr === undefined || el.attributes[attr] === undefined){
+		return '<LABEL>';
 	}else{
 		return el.attributes[attr].value.replace(/(-|_)/g, ' ');
 	}
 }
 
 function getElementCategory(el){
-	var valid_attrs = ['data-ga-category', 'id'];
+	var valid_attrs = ['id', 'data-ga-category'];
 
+	var category;
+	
 	valid_attrs.forEach(function(attribute){
+		category = qsa(el).attr(attribute);
+	});
 
+	return category;
+
+}
+
+function getFullElementLabel(el){
+	
+	var label_identifiers = ['class', 'id', 'data-ga-label'];
+
+	if(el.textContent.length > 0){
+		var event_label = labelElement(el, 'text');	
+	}
+
+	label_identifiers.forEach(function(identifier){
+		if( qsa(el).attr(identifier) != undefined){
+			var event_label = labelElement(el, identifier);
+		}
 	});
 
 }
@@ -154,13 +174,14 @@ function addClickTracking(options){
 	//Apply default options
 	options = copyMissingProperties(default_options, options);
 
+	//Generate CSS selector to target desired elements
 	var selector = createTargetSelector(options.targets, options.exclusions);
 
 	qsa(selector).onClick(function(){
 		console.log(this.textContent);
 	});
 
-	return getElementLabel(qsa(selector)[0]);
+	//return getFullElementLabel( qsa(selector)[0] );
 
 }
 
