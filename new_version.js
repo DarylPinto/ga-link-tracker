@@ -169,18 +169,7 @@ function getElementCategory(el){
 
 function getFullElementLabel(el){
 	
-	var label_identifiers = ['class', 'id', 'data-ga-label'];
-	var element_parents = [];
-
-	if(el.textContent.length > 0){
-		var event_label = labelElement(el, 'text');	
-	}
-
-	label_identifiers.forEach(function(identifier){
-		if( qsa(el).attr(identifier) != undefined){
-			var event_label = labelElement(el, identifier);
-		}
-	});
+	
 
 }
 
