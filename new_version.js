@@ -40,6 +40,21 @@ function qsa(selector){ //Simulates jQuery $(el)
 	}
 }
 
+Array.prototype.toNodeList = function(){
+	//Converts an array of elements into a nodelist
+	this.forEach(function(el){
+		el.setAttribute('wrapNodeList', '');
+	});
+
+	var list = document.querySelectorAll('[wrapNodeList]');
+
+	this.forEach(function(el){
+		el.removeAttribute('wrapNodeList');
+	});
+
+	return list;
+}
+
 Node.prototype.toNodeList = function(){
 	//Converts node to nodelist.
 	//(useful for using all the following nodelist methods
@@ -48,6 +63,11 @@ Node.prototype.toNodeList = function(){
 	var list = document.querySelectorAll('[wrapNodeList]');
 	this.removeAttribute('wrapNodeList');
 	return list;
+}
+
+NodeList.prototype.toArray = function(){
+	//Converts nodelist to array (useful for running familiar array.prototype functions)
+	return Array.prototype.slice.call(this);
 }
 
 NodeList.prototype.each = function(callback){ //Simulates jQuery $(el).each(); 
@@ -60,6 +80,29 @@ NodeList.prototype.onClick = function(callback){ //Simulates jQuery $(el).click(
 	this.each(function(){
 		this.addEventListener('click', callback);
 	});
+}
+
+NodeList.prototype.parents = function(selector){ //Simulates jQuery $(el).parents();
+	
+	var el = this[0];
+
+	var parent = el.parentNode;
+	var parent_array = [parent];
+
+	//Keep adding parents until html element is reached
+	while(parent != qs('html') ){
+		parent = parent.parentNode;
+		parent_array.push( parent );
+	}
+
+	//Filter by selector
+	if(selector != undefined){
+		parent_array = parent_array.filter(function(el){
+			return qsa(selector).toArray().indexOf(el) > -1;
+		});
+	}
+
+	return parent_array.toNodeList();
 }
 
 NodeList.prototype.attr = function(attribute, desired_value){ //Simulates jQuery $(el).attr();
@@ -127,6 +170,7 @@ function getElementCategory(el){
 function getFullElementLabel(el){
 	
 	var label_identifiers = ['class', 'id', 'data-ga-label'];
+	var element_parents = [];
 
 	if(el.textContent.length > 0){
 		var event_label = labelElement(el, 'text');	
