@@ -14,7 +14,7 @@ addClickTracking({
 	show_console_logs: false
 });
 
-This will automatically add click event tracking to all specified targets.
+This will automatically add click event tracking to all specified elements.
 ==================================
 */
 
@@ -22,101 +22,84 @@ This will automatically add click event tracking to all specified targets.
 //jQuery simulations//
 //////////////////////
 
-function qs(selector){ //Simulates jQuery $(el)
+NodeList.prototype.toArray = function(){
+	//Converts NodeList to Array (Allows use of familiar Array.prototype functions)
+	return Array.prototype.slice.call(this);
+}
+
+function qs(selector){
 	return document.querySelector(selector);
 }
 
 function qsa(selector){ //Simulates jQuery $(el)
-	//If argument is a string, run queryselectorall on it
-	if(typeof selector === 'string' || typeof selector === 'undefined'){
-		selector = (arguments.length === 1 && selector.length > 0) ? selector : 'no tag'; //Create empty nodelist if no parameter is given
-		return document.querySelectorAll(selector);
-	}
+	var el_array = [];
 
-	//If argument is a Node, return a nodelist with that node inside it
+	//If argument is a string run document.querySelectorAll on it.
+	if(typeof selector === 'string' || typeof selector === 'undefined'){
+		el_array = document.querySelectorAll(selector).toArray();
+	}
+	//If argument is a DOM element, return it inside an array
 	else{
 		var el = selector;
-		return el.toNodeList();
+		el_array.push(el);
 	}
+
+	return el_array;
 }
 
-Array.prototype.toNodeList = function(){
-	//Converts an array of elements into a nodelist
-	this.forEach(function(el){
-		el.setAttribute('wrapNodeList', '');
-	});
-
-	var list = document.querySelectorAll('[wrapNodeList]');
-
-	this.forEach(function(el){
-		el.removeAttribute('wrapNodeList');
-	});
-
-	return list;
-}
-
-Node.prototype.toNodeList = function(){
-	//Converts node to nodelist.
-	//(useful for using all the following nodelist methods
-	//without needing to make seperate ones specifically for nodes)
-	this.setAttribute('wrapNodeList', '');
-	var list = document.querySelectorAll('[wrapNodeList]');
-	this.removeAttribute('wrapNodeList');
-	return list;
-}
-
-NodeList.prototype.toArray = function(){
-	//Converts nodelist to array (useful for running familiar array.prototype functions)
-	return Array.prototype.slice.call(this);
-}
-
-NodeList.prototype.each = function(callback){ //Simulates jQuery $(el).each(); 
-	for(var i=0;i < this.length;i++){
-		callback.call(this[i]);
-	}
-}
-
-NodeList.prototype.onClick = function(callback){ //Simulates jQuery $(el).click();
-	this.each(function(){
+Array.prototype.onClick = function(callback){ //Simulates jQuery $(el).click();
+	this.forEach(function(){
 		this.addEventListener('click', callback);
 	});
 }
 
-NodeList.prototype.parents = function(selector){ //Simulates jQuery $(el).parents();
-	
-	var el = this[0];
+Array.prototype.parents = function(selector){
+	var parent_array = [];
 
-	var parent = el.parentNode;
-	var parent_array = [parent];
+	this.forEach(function(el){
 
-	//Keep adding parents until html element is reached
-	while(parent != qs('html') ){
-		parent = parent.parentNode;
-		parent_array.push( parent );
-	}
+		var parent = el.parentNode;
 
-	//Filter by selector
-	if(selector != undefined){
-		parent_array = parent_array.filter(function(el){
-			return qsa(selector).toArray().indexOf(el) > -1;
-		});
-	}
+		if(parent_array.indexOf(parent) === -1){
+			parent_array.push(parent);	
+		}
 
-	return parent_array.toNodeList();
+		//Keep adding parents until html element is reached
+		while(parent != qs('html') ){
+			parent = parent.parentNode;
+
+			if(parent_array.indexOf(parent) === -1){
+				parent_array.push(parent);	
+			}
+
+		}
+
+		//Filter by selector
+		if(selector != undefined){
+
+			parent_array = parent_array.filter(function(el){
+				return qsa(selector).indexOf(el) > -1;
+			});
+
+		}
+
+	});
+
+	return parent_array;
 }
 
-NodeList.prototype.attr = function(attribute, desired_value){ //Simulates jQuery $(el).attr();
+Array.prototype.attr = function(attribute, desired_value){ //Simulates jQuery $(el).attr();
 	var return_value;
-	var node_list = this;
+	var node_array = this;
 	if(arguments.length === 1){
-		this.each(function(){
-			var x = this.getAttributeNode(attribute);
+		this.forEach(function(el){
+			var x = el.getAttributeNode(attribute);
 			return_value = (x == null) ? undefined : x.value;
 		});
 	}else{
-		this.each(function(){
-			this.setAttribute(attribute, desired_value);
-			return_value = node_list;
+		this.forEach(function(el){
+			el.setAttribute(attribute, desired_value);
+			return_value = node_array;
 		});
 	}
 	return return_value;
